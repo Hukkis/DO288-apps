@@ -85,6 +85,7 @@ pipeline {
 		sh '''
 			oc new-app --as-deployment-config ${APP_NAME}:latest -n ${DEV_PROJECT}
 			oc expose svc/${APP_NAME} -n ${DEV_PROJECT}
+		   '''
             }
         }
 
@@ -120,16 +121,18 @@ pipeline {
                 echo '### Cleaning existing resources in Staging ###'
                 sh '''
                         oc project ${STAGE_PROJECT}
-                       
+                        oc delete all -l app=${APP_NAME} 
 			
                         sleep 5
                    '''
 
                 echo '### Creating a new app in Staging ###'
                 // TODO: Create a new app in staging and expose the service
-		oc project ${STAGE_PROJECT}
-		oc new-app --as-deployment-config --name ${APP_NAME} -i ${APP_NAME}:stage
-		oc expose svc/${APP_NAME}
+		sh '''
+			oc project ${STAGE_PROJECT}
+			oc new-app --as-deployment-config --name ${APP_NAME} -i ${APP_NAME}:stage
+			oc expose svc/${APP_NAME}
+		   '''
             }
         }
 
